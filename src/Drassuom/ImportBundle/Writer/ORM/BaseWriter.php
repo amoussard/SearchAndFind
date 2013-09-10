@@ -84,7 +84,7 @@ abstract class BaseWriter
      * @param RegistryManager $registry
      * @DI\InjectParams({
      *     "em"         = @DI\Inject("doctrine.orm.entity_manager"),
-     *     "registry"   = @DI\Inject("nova_import.registry_manager")
+     *     "registry"   = @DI\Inject("drassuom_import.registry_manager")
      * })
      */
     public function __construct(EntityManager $em, RegistryManager $registry) {

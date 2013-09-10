@@ -6,7 +6,7 @@ use Drassuom\ImportBundle\Writer\ORM\BaseWriter;
 use JMS\DiExtraBundle\Annotation as DI;
 
 /**
- * @DI\Service("drassuom_location.import.writer.country", scope="prototype")
+ * @DI\Service("drassuom_location.import.writer.country")
  */
 class CountryWriter extends BaseWriter
 {

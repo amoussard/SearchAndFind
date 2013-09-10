@@ -41,7 +41,7 @@ abstract class BaseORMConverter extends Converter
      * @param $registry
      * @InjectParams({
      *     "em"         = @Inject("doctrine.orm.entity_manager"),
-     *     "registry"   = @Inject("nova_import.registry_manager")
+     *     "registry"   = @Inject("drassuom_import.registry_manager")
      * })
      */
     public function __construct(EntityManager $em, RegistryManager $registry)

@@ -4,7 +4,7 @@ namespace Drassuom\ImportBundle;
 
 use Drassuom\ImportBundle\Writer\ORM\BaseWriter;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Form\Util\PropertyPath;
 
 use Drassuom\ImportBundle\Exception\ConfigException;
@@ -64,7 +64,7 @@ class Workflow
     protected $container;
 
     /**
-     * @var \Symfony\Component\Translation\Translator
+     * @var IdentityTranslator
      */
     protected $translator;
 
@@ -125,9 +125,9 @@ class Workflow
 
     /**
      * @param \Symfony\Component\DependencyInjection\Container $container
-     * @param \Symfony\Component\Translation\Translator        $translator
+     * @param IdentityTranslator        $translator
      */
-    public function __construct(Container $container, Translator $translator) {
+    public function __construct(Container $container, IdentityTranslator $translator) {
         $this->container = $container;
         $this->writers = array();
         $this->translator = $translator;
