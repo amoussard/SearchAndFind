@@ -1,0 +1,7 @@
+parameters:
+#    drassuom_import.example.class: Drassuom\ImportBundle\Example
+
+services:
+#    drassuom_import.example:
+#        class: %drassuom_import.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]
