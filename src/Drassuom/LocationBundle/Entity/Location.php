@@ -30,9 +30,32 @@ class Location
      * @var string
      *
      * @Gedmo\Translatable
+     * @ORM\Column(name="geoname_id", type="string", length=255)
+     */
+    private $geonameId;
+
+    /**
+     * @var string
+     *
+     * @Gedmo\Translatable
      * @ORM\Column(name="name", type="string", length=255)
      */
     private $name;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="latitude", type="string", length=255)
+     */
+    private $latitude;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="longitude", type="string", length=255)
+     */
+    private $longitude;
+
 
     /**
      * @var \DateTime
@@ -49,20 +72,6 @@ class Location
      * @ORM\Column(name="updatedAt", type="datetime")
      */
     private $updatedAt;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="latitude", type="string", length=255)
-     */
-    private $latitude;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="longitude", type="string", length=255)
-     */
-    private $longitude;
 
     /**
      * @ORM\OneToMany(targetEntity="Location", mappedBy="parent")
@@ -233,6 +242,20 @@ class Location
      */
     public function getParent() {
         return $this->parent;
+    }
+
+    /**
+     * @param string $geonameId
+     */
+    public function setGeonameId($geonameId) {
+        $this->geonameId = $geonameId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGeonameId() {
+        return $this->geonameId;
     }
 
 

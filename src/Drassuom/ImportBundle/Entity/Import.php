@@ -127,13 +127,6 @@ class Import
     private $archive = null;
 
     /**
-     * @var string $archiveFilePath
-     *
-     * @ORM\Column(name="archive_path", type="string", nullable=true)
-     */
-    private $archiveFilePath = null;
-
-    /**
      * @var string
      */
     private $extractedDirPath = null;
@@ -473,9 +466,6 @@ class Import
         if ($this->file && !$this->filePath) {
             $this->filePath = $this->file->getPath();
         }
-        if ($this->archive && !$this->archiveFilePath) {
-            $this->archiveFilePath = $this->archive->getPath();
-        }
     }
 
     /**
@@ -515,21 +505,5 @@ class Import
     public function getFilePath()
     {
         return $this->filePath;
-    }
-
-    /**
-     * @param string $archiveFilePath
-     */
-    public function setArchiveFilePath($archiveFilePath)
-    {
-        $this->archiveFilePath = $archiveFilePath;
-    }
-
-    /**
-     * @return string
-     */
-    public function getArchiveFilePath()
-    {
-        return $this->archiveFilePath;
     }
 }

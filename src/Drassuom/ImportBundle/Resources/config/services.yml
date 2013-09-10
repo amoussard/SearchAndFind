@@ -1,7 +1,24 @@
 parameters:
-#    drassuom_import.example.class: Drassuom\ImportBundle\Example
+    drassuom_import.manager.class: Drassuom\ImportBundle\Manager\ImportManager
+    drassuom_import.registry_manager.class: Drassuom\ImportBundle\Manager\RegistryManager
+    drassuom_import.encoding.converter.class: Drassuom\ImportBundle\Encoding\FileEncodingManager
 
 services:
-#    drassuom_import.example:
-#        class: %drassuom_import.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+    drassuom_import.manager:
+        class: %drassuom_import.manager.class%
+        arguments:
+            - @service_container
+            - @doctrine.orm.entity_manager
+            - @drassuom_import.encoding.converter
+            - @logger
+            - @translator
+            - %drassuom_import.config%
+
+    drassuom_import.registry_manager:
+        class: %drassuom_import.registry_manager.class%
+
+    drassuom_import.encoding.converter:
+        class: %drassuom_import.encoding.converter.class%
+        arguments:
+            - @logger
+            - %drassuom_import.config.reencoding_path%

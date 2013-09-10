@@ -21,8 +21,15 @@ class DrassuomImportExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
+        var_dump($config);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('converter.yml');
+
+        $container->setParameter("drassuom_import.config", $config);
+        $container->setParameter("drassuom_import.config.reencoding_path", $config['reencoding_path']);
+        $container->setAlias('entity_finder', 'drassuom_import.converter.orm.entity_finder');
+        $container->setAlias('mapping_finder', 'drassuom_import.converter.orm.mapping_finder');
     }
 }

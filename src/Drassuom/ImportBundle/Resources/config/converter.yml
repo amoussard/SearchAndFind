@@ -1,0 +1,16 @@
+parameters:
+    drassuom_import.converter.orm.entity_finder.class: Drassuom\ImportBundle\Converter\ORM\EntityFinder
+    drassuom_import.converter.orm.mapping_finder.class: Drassuom\ImportBundle\Converter\ORM\MappingFinder
+
+services:
+    drassuom_import.converter.orm.entity_finder:
+        class: %drassuom_import.converter.orm.entity_finder.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @drassuom_import.registry_manager
+
+    drassuom_import.converter.orm.mapping_finder:
+        class: %drassuom_import.converter.orm.mapping_finder.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @drassuom_import.registry_manager

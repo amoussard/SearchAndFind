@@ -1,0 +1,5 @@
+imports:
+    - { resource: '@DrassuomLocationBundle/Resources/config/import/import.yml' }
+
+drassuom_import:
+    reencoding_path:    /tmp/reencoded/

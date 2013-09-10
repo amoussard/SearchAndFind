@@ -5,7 +5,7 @@ namespace Drassuom\ImportBundle\Manager;
 use Symfony\Component\DependencyInjection\Container;
 
 use Symfony\Bridge\Monolog\Logger;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Translation\IdentityTranslator;
 use Doctrine\ORM\EntityManager;
 
 use Drassuom\ImportBundle\Workflow;
@@ -18,8 +18,6 @@ use Drassuom\ImportBundle\Exception\ConfigException;
 
 /**
  * Description of ImportManager.php
- *
- * @author: m.monsang <m.monsang@novactive.com>
  */
 class ImportManager
 {
@@ -83,10 +81,10 @@ class ImportManager
      * @param \Doctrine\ORM\EntityManager                            $em
      * @param FileEncodingManager                                    $encodingManager
      * @param \Symfony\Bridge\Monolog\Logger                         $logger
-     * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
+     * @param IdentityTranslator              $translator
      * @param array                                                  $config
      */
-    public function __construct(Container $container, EntityManager $em, FileEncodingManager $encodingManager, Logger $logger, Translator $translator, array $config) {
+    public function __construct(Container $container, EntityManager $em, FileEncodingManager $encodingManager, Logger $logger, IdentityTranslator $translator, array $config) {
         $this->container = $container;
         $this->em = $em;
         $this->config = $config;

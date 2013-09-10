@@ -20,7 +20,7 @@ do
            rm $ZIP
        cd $BASE_DIR
        FILE=$GEONAME_DIR/$FILE
-       f_launch_cmd "php app/console drassuom:import $FILE geoname_district1"
+       f_launch_cmd "php app/console drassuom:import $FILE geoname_country"
 #       f_launch_cmd "php app/console nova:import $FILE geoname_district2"
 #       f_launch_cmd "php app/console nova:import $FILE geoname_city"
 #       f_launch_cmd "php app/console nova:import $FILE geoname_city --include=adm_city --include=capital"

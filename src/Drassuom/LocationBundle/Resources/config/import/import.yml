@@ -1,0 +1,15 @@
+drassuom_import:
+    types:
+        geoname_country:
+            writer: drassuom_location.import.writer.country
+            writer_options: {class: Drassuom\LocationBundle\Entity\Country}
+            ref_fields: [geonameId]
+            known_extensions:
+                txt: csv
+            csv:
+                delimiter: "\t"
+                mapping:
+                    geonameId:                  {path: 0}
+                    name:                       {path: 1}
+                    latitude:                   {path: 4}
+                    longitude:                  {path: 5}

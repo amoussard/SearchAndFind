@@ -48,7 +48,7 @@ class ImportCommand extends ContainerAwareCommand
         $oImport->setFile($oFile);
 
         $output->writeln(sprintf('Start importing file: <comment>%s</comment> ... at <comment>%s</comment>', $oFile->getFilename(), $oBeginAt->format('c')));
-        $oManager = $this->getContainer()->get("nova_import.manager");
+        $oManager = $this->getContainer()->get("drassuom_import.manager");
 
         $aImportList = array($aOptions["type"] => $oImport);
         /** @var ImportManager $oManager */
