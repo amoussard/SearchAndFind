@@ -23,6 +23,8 @@ class Configuration implements ConfigurationInterface
 
         $node = $rootNode->children();
 
+        $node->scalarNode('lock_file')->defaultValue('/tmp/drassuom_import.lock');
+        $node->scalarNode('progress_file')->defaultValue('%kernel.root_dir%/../web/drassuom_import.progress.json');
         $node = $node
             ->scalarNode('reencoding_path')->defaultValue('/tmp/reencoded/')->end()
             ->arrayNode('types')
@@ -35,7 +37,7 @@ class Configuration implements ConfigurationInterface
                     ->arrayNode('writer_options')->useAttributeAsKey('key')->prototype('scalar')->end()->end()
                     ->arrayNode('ref_fields')->useAttributeAsKey('name')->prototype('scalar')->end()->end()
                     ->scalarNode('ref_field_name')->end()
-                    ->scalarNode('validator')->defaultValue('nova_import.validator.default')->end()
+                    ->scalarNode('validator')->defaultValue('drassuom_import.validator.default')->end()
                     ->arrayNode("known_extensions")->useAttributeAsKey('name')->prototype('scalar')->end()->end();
 
         $this->addCsvConfiguration($node);

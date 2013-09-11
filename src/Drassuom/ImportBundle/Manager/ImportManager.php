@@ -67,6 +67,11 @@ class ImportManager
     protected $currentWorkflow;
 
     /**
+     * @var ProgressManager
+     */
+    protected $progressManager;
+
+    /**
      * @var array
      */
     protected $options = array(
@@ -77,14 +82,15 @@ class ImportManager
     );
 
     /**
-     * @param \Symfony\Component\DependencyInjection\Container       $container
-     * @param \Doctrine\ORM\EntityManager                            $em
-     * @param FileEncodingManager                                    $encodingManager
-     * @param \Symfony\Bridge\Monolog\Logger                         $logger
-     * @param IdentityTranslator              $translator
-     * @param array                                                  $config
+     * @param \Symfony\Component\DependencyInjection\Container $container
+     * @param \Doctrine\ORM\EntityManager                      $em
+     * @param FileEncodingManager                              $encodingManager
+     * @param \Symfony\Bridge\Monolog\Logger                   $logger
+     * @param IdentityTranslator                               $translator
+     * @param array                                            $config
+     * @param ProgressManager                                  $progressManager
      */
-    public function __construct(Container $container, EntityManager $em, FileEncodingManager $encodingManager, Logger $logger, IdentityTranslator $translator, array $config) {
+    public function __construct(Container $container, EntityManager $em, FileEncodingManager $encodingManager, Logger $logger, IdentityTranslator $translator, array $config, ProgressManager $progressManager) {
         $this->container = $container;
         $this->em = $em;
         $this->config = $config;
@@ -93,6 +99,7 @@ class ImportManager
         $this->encodingManager = $encodingManager;
         $this->encodingManager->setLogger($logger);
         $this->writerList = array();
+        $this->progressManager = $progressManager;
     }
 
     /**
@@ -106,8 +113,19 @@ class ImportManager
         $this->setOptions($aOptions);
         $writer = null;
         $begin = new \DateTime();
+
         if (!is_array($aImportList)) {
             $aImportList = array($aImportList);
+        }
+
+        if (!$this->progressManager->lock($aOptions)) {
+            if (count($aImportList) > 0) {
+                /** @var Import $oImport */
+                $oImport = $aImportList[0];
+                $oImport->setSuccess(false);
+                $oImport->addError("Impossible d'effectuer cette tâche, car un autre import est déjà en cours d'exécution.");
+            }
+            return false;
         }
 
         // disable SQL logger (increase speed)
@@ -138,6 +156,10 @@ class ImportManager
                 $oImport->addError($e);
                 $this->log($oImport, $sType);
                 $this->cleanUp($oImport);
+                if ($this->getOption('throwException')) {
+                    $this->progressManager->unlock();
+                    throw $e;
+                }
             }
             if ($this->stop) {
                 break;
@@ -148,6 +170,8 @@ class ImportManager
         foreach ($this->writerList as $oWriter) {
             $oWriter->finishAll($begin);
         }
+
+        $this->progressManager->unlock();
 
         return $aImportList;
     }
@@ -168,6 +192,11 @@ class ImportManager
     }
 
     public  function onProgress() {
+        $progressFile = $this->config['progress_file'];
+        if ($this->currentWorkflow) {
+            $progress = $this->currentWorkflow->getProgressInfos();
+            @file_put_contents($progressFile, json_encode($progress));
+        }
     }
 
     /**
@@ -227,10 +256,13 @@ class ImportManager
         $oWorkflow->setPreValidators($aConfig['pre_validators']);
         $oWorkflow->setPostValidators($aConfig['post_validators']);
         $oWorkflow->setRefFields($this->getRefFields($sType));
+        $oWorkflow->setProgressManager($this->progressManager);
         $oWorkflow->setLogger($this->logger);
+        $this->progressManager->setLogger($this->logger);
 
         if (!empty($aOptions['output'])) {
             $oWorkflow->setOutput($aOptions['output']);
+            $this->progressManager->setOutput($aOptions['output']);
         }
 
         if (!empty($aOptions['filters'])) {

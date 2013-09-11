@@ -24,6 +24,6 @@ do
 #       f_launch_cmd "php app/console nova:import $FILE geoname_district2"
 #       f_launch_cmd "php app/console nova:import $FILE geoname_city"
 #       f_launch_cmd "php app/console nova:import $FILE geoname_city --include=adm_city --include=capital"
-       rm $FILE
+#       rm $FILE
     fi
 done

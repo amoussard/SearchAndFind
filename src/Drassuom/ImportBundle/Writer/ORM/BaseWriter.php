@@ -12,8 +12,6 @@ use Drassuom\ImportBundle\Manager\RegistryManager;
 
 /**
  * Write an item into db
- *
- * @author: m.monsang <m.monsang@novactive.com>
  */
 abstract class BaseWriter
 {

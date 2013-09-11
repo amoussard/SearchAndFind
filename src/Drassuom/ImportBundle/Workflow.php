@@ -2,10 +2,12 @@
 
 namespace Drassuom\ImportBundle;
 
+use Doctrine\ORM\EntityManager;
+use Drassuom\ImportBundle\Manager\ProgressManager;
 use Drassuom\ImportBundle\Writer\ORM\BaseWriter;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Translation\IdentityTranslator;
-use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Drassuom\ImportBundle\Exception\ConfigException;
 use Drassuom\ImportBundle\Entity\Import;
@@ -124,6 +126,11 @@ class Workflow
     protected $stop = false;
 
     /**
+     * @var ProgressManager
+     */
+    protected $progressManager;
+
+    /**
      * @param \Symfony\Component\DependencyInjection\Container $container
      * @param IdentityTranslator        $translator
      */
@@ -139,9 +146,11 @@ class Workflow
         $this->prepare($import);
         // Read all items
         $this->countRow = $this->reader->count();
+        $this->progressManager->setupProgress($this, $this->countRow);
         foreach ($this->reader as $item) {
             $this->currentRow++;
             $this->processItem($import, $item);
+            $this->progressManager->showProgress($this->currentRow);
             if ($this->stop) {
                 if ($this->output) {
                     $this->output->writeln("\n<comment>Someone ask me to stop</comment>. Current row is <info>".$this->currentRow.'</info>');
@@ -150,6 +159,7 @@ class Workflow
             }
         }
         $this->finish($import);
+        $this->progressManager->clearProgress();
         return $this->currentRow;
     }
 
@@ -780,6 +790,14 @@ class Workflow
     public function setStop($stop)
     {
         $this->stop = $stop;
+    }
+
+    /**
+     * @param ProgressManager $progressManager
+     */
+    public function setProgressManager(ProgressManager $progressManager)
+    {
+        $this->progressManager = $progressManager;
     }
 
     /**

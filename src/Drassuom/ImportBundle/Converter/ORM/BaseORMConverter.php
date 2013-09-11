@@ -11,8 +11,6 @@ use Drassuom\ImportBundle\Manager\RegistryManager;
 
 /**
  * Description of BaseConverter.php
- *
- * @author: m.monsang <m.monsang@novactive.com>
  */
 abstract class BaseORMConverter extends Converter
 {

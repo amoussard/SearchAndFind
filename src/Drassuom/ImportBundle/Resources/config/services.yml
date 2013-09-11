@@ -13,6 +13,7 @@ services:
             - @logger
             - @translator
             - %drassuom_import.config%
+            - @drassuom_import.progress.manager
 
     drassuom_import.registry_manager:
         class: %drassuom_import.registry_manager.class%

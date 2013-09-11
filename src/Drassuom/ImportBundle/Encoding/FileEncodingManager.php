@@ -8,8 +8,6 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Description of FileEncodingManager.php
- *
- * @author: m.monsang <m.monsang@novactive.com>
  */
 class FileEncodingManager
 {

@@ -89,6 +89,7 @@ class Location
 
     public function __construct() {
         $this->setCreatedAt(new \DateTime("now"));
+        $this->setUpdatedAt(new \DateTime("now"));
     }
 
     /**
