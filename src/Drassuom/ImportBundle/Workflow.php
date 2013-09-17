@@ -26,7 +26,7 @@ class Workflow
     protected $writers;
 
     /**
-     * @var Traversable
+     * @var \Traversable
      */
     protected $reader;
 

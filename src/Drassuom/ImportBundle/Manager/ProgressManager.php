@@ -15,7 +15,6 @@ use JMS\DiExtraBundle\Annotation as DI;
  */
 class ProgressManager
 {
-
     const LOCK_EXCEEDED = 5;
 
     /**
@@ -56,38 +55,47 @@ class ProgressManager
     protected $currentPid = null;
 
     /**
-     * @param array $config
+     * @var int
+     */
+    protected $memoryUsage = 0;
+
+    /**
+     * @param array $aConfig
      *
      * @DI\InjectParams({
-     *     "config"         = @DI\Inject("%drassuom_import.config%"),
+     *     "aConfig"         = @DI\Inject("%drassuom_import.config%"),
      * })
      */
-    public function __construct(array $config) {
-        $this->config = $config;
+    public function __construct(array $aConfig) {
+        $this->config = $aConfig;
     }
 
     /**
      * Create an lock file
+     *
+     * @param array $aOptions
+     *
+     * @return bool
      */
-    public function lock($options) {
-        $options = array_merge($this->config, $options);
+    public function lock(array $aOptions) {
+        $aOptions = array_merge($this->config, $aOptions);
 
-        if (!empty($options['no-lock'])) {
+        if (!empty($aOptions['no-lock'])) {
             return true;
         }
-        if (isset($options['pid'])) {
-            $this->currentPid = $options['pid'];
+        if (isset($aOptions['pid'])) {
+            $this->currentPid = $aOptions['pid'];
         }
-        $lockFile = $this->config['lock_file'];
-        if (file_exists($lockFile)) {
-            if (!is_readable($lockFile)) {
+        $sLockFile = $this->config['lock_file'];
+        if (file_exists($sLockFile)) {
+            if (!is_readable($sLockFile)) {
                 return false;
             }
-            $pid = trim(basename(file_get_contents($lockFile)));
-            if ($pid && is_dir("/proc/$pid")) {
+            $iPid = trim(basename(file_get_contents($sLockFile)));
+            if ($iPid && is_dir("/proc/$iPid")) {
                 $i = 0;
                 // don't wait until the end of the process at this time
-                while (file_exists($lockFile)) {
+                while (file_exists($sLockFile)) {
                     sleep(++$i);
                     if ($i > self::LOCK_EXCEEDED) {
                         return false;
@@ -95,35 +103,32 @@ class ProgressManager
                 }
             }
         }
-        $pid = $this->getPid();
-        @file_put_contents($lockFile, (string)$pid, FILE_APPEND | LOCK_EX);
+        $iPid = $this->getPid();
+        @file_put_contents($sLockFile, (string)$iPid, FILE_APPEND | LOCK_EX);
         return true;
     }
 
     public function unlock() {
         $this->currentPid = null;
-        $lockFile = $this->config['lock_file'];
-        @unlink($lockFile);
-        $progressFile = $this->config['progress_file'];
-        @unlink($progressFile);
+        $sLockFile = $this->config['lock_file'];
+        @unlink($sLockFile);
+        $sProgressFile = $this->config['progress_file'];
+        @unlink($sProgressFile);
     }
 
-    /**
-     *
-     */
     protected function setupSignals() {
         declare(ticks = 1);
         if (function_exists("pcntl_signal")) {
-            pcntl_signal(SIGINT, array( &$this, "onStop" ));
-            pcntl_signal(SIGUSR1, array( &$this, "onProgress" ));
-            pcntl_signal(SIGUSR2, array( &$this, "onProgress" ));
+            pcntl_signal(SIGINT, array(&$this, "onStop"));
+            pcntl_signal(SIGUSR1, array(&$this, "onProgress"));
+            pcntl_signal(SIGUSR2, array(&$this, "onProgress"));
         }
     }
 
     /**
-     * @param $signal
+     * @param integer $iSignal
      */
-    public  function onStop($signal) {
+    public  function onStop($iSignal) {
         if ($this->currentWorkflow) {
             $this->currentWorkflow->setStop(true);
         }
@@ -131,9 +136,9 @@ class ProgressManager
     }
 
     /**
-     * @param $signal
+     * @param integer $iSignal
      */
-    public  function onProgress($signal) {
+    public  function onProgress($iSignal) {
         if ($this->currentWorkflow) {
             $progress = $this->getProgressInfos($this->currentWorkflow->getCurrentRow());
             $this->writeProgress($progress);
@@ -141,34 +146,34 @@ class ProgressManager
     }
 
     /**
-     * @param array $progressInfos
+     * @param array $aProgressInfos
      */
-    protected function writeProgress(array &$progressInfos) {
-        $progressFile = $this->config['progress_file'];
-        $pid = $this->getPid();
-        @file_put_contents($progressFile, json_encode(array($pid => $progressInfos)));
+    protected function writeProgress(array &$aProgressInfos) {
+        $sProgressFile = $this->config['progress_file'];
+        $iPid = $this->getPid();
+        @file_put_contents($sProgressFile, json_encode(array($iPid => $aProgressInfos)));
     }
 
     /**
-     * @return bool|mixed
+     * @return mixed
      */
     public function getCurrentImportProgression() {
         $progressFile = $this->config['progress_file'];
         return json_decode(@file_get_contents($progressFile));
-
     }
 
     /**
-     * @param Workflow  $worflow
-     * @param           $countRow
+     * @param Workflow $oWorkflow
+     * @param integer  $iCountRow
      */
-    public function setupProgress(Workflow $worflow, $countRow) {
+    public function setupProgress(Workflow $oWorkflow, $iCountRow) {
         $this->beginAt = microtime(true);
-        $this->countRow = $countRow;
+        $this->memoryUsage = memory_get_usage(true);
+        $this->countRow = $iCountRow;
         if ($this->output) {
             $this->output->write(sprintf("\r%80s\r", ''));
         }
-        $this->currentWorkflow = $worflow;
+        $this->currentWorkflow = $oWorkflow;
         $this->setupSignals();
     }
 
@@ -182,85 +187,90 @@ class ProgressManager
     }
 
     /**
-     * @param $currentRow
+     * @param integer   $iCurrentRow
      */
-    public function showProgress($currentRow) {
+    public function showProgress($iCurrentRow) {
         if ($this->countRow > 1000) {
-            $step = intval($this->countRow / 100);
+            $iStep = intval($this->countRow / 100);
         } else {
-            $step = intval($this->countRow / 10);
+            $iStep = intval($this->countRow / 10);
         }
-        if ($step && (($currentRow - 1) % $step == 0)) {
-            $progresssInfos = $this->getProgressInfos($currentRow);
-            $this->writeProgress($progresssInfos);
-            $progress = $progresssInfos['progress'];
+        if ($iStep && (($iCurrentRow - 1) % $iStep == 0)) {
+            $aProgressInfos = $this->getProgressInfos($iCurrentRow);
+            $this->writeProgress($aProgressInfos);
+            $iProgress = $aProgressInfos['progress'];
             if ($this->logger) {
-                $progress = ($progress) ? $progress : 'INF';
-                $this->logger->debug(var_export($progresssInfos, 1));
+                $iProgress = ($iProgress) ? $iProgress : 'INF';
+                $this->logger->debug(var_export($aProgressInfos, 1));
             }
-            if ($this->output && $progress) {
-                $nbStepPassed = floor(($progress * 2) / 10);
-                $nbStepMiss = 20 - $nbStepPassed;
-                $infos = sprintf("<info>%02d %% </info><comment>%s</comment>",
-                    $progress,
-                    ($progresssInfos['timeLeft'] !== null) ? $progresssInfos['timeLeft'] : ''
+            if ($this->output && $iProgress) {
+                $iNbStepPassed = floor(($iProgress * 2) / 10);
+                $iNbStepMiss = 20 - $iNbStepPassed;
+                $sInfos = sprintf("<info>%02d %% </info><comment>%s</comment><comment>Memory usage : %s</comment>",
+                    $iProgress,
+                    ($aProgressInfos['timeLeft'] !== null) ? $aProgressInfos['timeLeft'] : '',
+                    ($aProgressInfos['memoryUsage'] !== null) ? $aProgressInfos['memoryUsage'] : ''
                 );
-                $str = sprintf(
-                    "\r[%'#".$nbStepPassed."s%".$nbStepMiss.'s] %s', '', '',
-                    $infos
+                $sStr = sprintf(
+                    "\r[%'#".$iNbStepPassed."s%".$iNbStepMiss.'s] %s', '', '',
+                    $sInfos
                 );
                 $this->output->write(sprintf("\r%80s", ''));
-                $this->output->write($str);
+                $this->output->write($sStr);
             }
         }
     }
 
     /**
-     * @param $currentRow
+     * @param integer $iCurrentRow
+     *
      * @return array
      */
-    public function getProgressInfos($currentRow) {
-        $progress = null;
-        $expectedTime = null;
-        $timeLeft = null;
-        $currentTimestamp = microtime(true);
-        $elapsed = intval($currentTimestamp - $this->beginAt);
+    public function getProgressInfos($iCurrentRow) {
+        $fProgress = null;
+        $iExpectedTime = null;
+        $iTimeLeft = null;
+        $iCurrentTimestamp = microtime(true);
+        $iElapsed = intval($iCurrentTimestamp - $this->beginAt);
         if ($this->countRow) {
-            $progress = round($currentRow / floatval($this->countRow) * 100, 2);
-            if ($elapsed > 60 && $progress) {
+            $fProgress = round($iCurrentRow / floatval($this->countRow) * 100, 2);
+            if ($iElapsed > 60 && $fProgress) {
                 // calcul de l'estimation de la fin de l'import
-                $expectedTime = ceil($elapsed * 100 / $progress);
-                $timeLeft = $expectedTime - $elapsed;
+                $iExpectedTime = ceil($iElapsed * 100 / $fProgress);
+                $iTimeLeft = $iExpectedTime - $iElapsed;
             }
         }
+        $this->memoryUsage = memory_get_usage(true);
 
         return array(
-            'currentRow'    => $currentRow,
+            'currentRow'    => $iCurrentRow,
             'beginAt'       => $this->beginAt,
             'countRow'      => $this->countRow,
-            'expectedTime'  => ($expectedTime) ? null : "$expectedTime s",
-            'elapsed'       => "$elapsed s",
-            'timeLeft'      => ($timeLeft) ? "$timeLeft s" : null,
-            'progress'      => round($progress),
+            'expectedTime'  => ($iExpectedTime) ? null : "$iExpectedTime s",
+            'elapsed'       => "$iElapsed s",
+            'timeLeft'      => ($iTimeLeft) ? "$iTimeLeft s" : null,
+            'progress'      => round($fProgress),
+            'memoryUsage'   => round($this->memoryUsage / 1000000, 2),
         );
     }
 
     /**
      * @param OutputInterface $output
      */
-    public function setOutput($output)
-    {
+    public function setOutput(OutputInterface $output) {
         $this->output = $output;
     }
 
     /**
-     * @param OutputInterface $logger
+     * @param Logger $logger
      */
-    public function setLogger($logger)
-    {
+    public function setLogger(Logger $logger) {
         $this->logger = $logger;
     }
 
+    /**
+     * @return int|string
+     */
     protected function getPid() {
         $pid = '';
         if (isset($this->currentPid)) {
