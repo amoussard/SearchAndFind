@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table("Location")
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="type", type="string")
- * @ORM\DiscriminatorMap({"city" = "City", "country" = "Country"})
+ * @ORM\DiscriminatorMap({ "continent" = "Continent", "country" = "Country", "city" = "City",})
  * @ORM\Entity(repositoryClass="Drassuom\LocationBundle\Entity\LocationRepository")
  */
 class Location
@@ -24,7 +24,7 @@ class Location
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
@@ -32,7 +32,7 @@ class Location
      * @Gedmo\Translatable
      * @ORM\Column(name="geoname_id", type="string", length=255)
      */
-    private $geonameId;
+    protected $geonameId;
 
     /**
      * @var string
@@ -40,21 +40,21 @@ class Location
      * @Gedmo\Translatable
      * @ORM\Column(name="name", type="string", length=255)
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="latitude", type="string", length=255)
+     * @ORM\Column(name="latitude", type="string", length=255, nullable=true)
      */
-    private $latitude;
+    protected $latitude;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="longitude", type="string", length=255)
+     * @ORM\Column(name="longitude", type="string", length=255, nullable=true)
      */
-    private $longitude;
+    protected $longitude;
 
 
     /**
@@ -63,7 +63,7 @@ class Location
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(name="createdAt", type="datetime")
      */
-    private $createdAt;
+    protected $createdAt;
 
     /**
      * @var \DateTime
@@ -71,18 +71,18 @@ class Location
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(name="updatedAt", type="datetime")
      */
-    private $updatedAt;
+    protected $updatedAt;
 
     /**
      * @ORM\OneToMany(targetEntity="Location", mappedBy="parent")
      **/
-    private $children;
+    protected $children;
 
     /**
      * @ORM\ManyToOne(targetEntity="Location", inversedBy="children")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
      **/
-    private $parent;
+    protected $parent;
 
 
 

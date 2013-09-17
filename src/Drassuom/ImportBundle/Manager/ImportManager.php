@@ -4,7 +4,7 @@ namespace Drassuom\ImportBundle\Manager;
 
 use Symfony\Component\DependencyInjection\Container;
 
-use Symfony\Bridge\Monolog\Logger;
+use Monolog\Logger;
 use Symfony\Component\Translation\IdentityTranslator;
 use Doctrine\ORM\EntityManager;
 
@@ -37,12 +37,12 @@ class ImportManager
     protected $container;
 
     /**
-     * @var \Symfony\Bridge\Monolog\Logger
+     * @var Logger
      */
     protected $logger;
 
     /**
-     * @var \Symfony\Bridge\Monolog\Logger
+     * @var IdentityTranslator
      */
     protected $translator;
 
@@ -85,19 +85,19 @@ class ImportManager
      * @param \Symfony\Component\DependencyInjection\Container $container
      * @param \Doctrine\ORM\EntityManager                      $em
      * @param FileEncodingManager                              $encodingManager
-     * @param \Symfony\Bridge\Monolog\Logger                   $logger
+     * @param Logger                                           $oLogger
      * @param IdentityTranslator                               $translator
      * @param array                                            $config
      * @param ProgressManager                                  $progressManager
      */
-    public function __construct(Container $container, EntityManager $em, FileEncodingManager $encodingManager, Logger $logger, IdentityTranslator $translator, array $config, ProgressManager $progressManager) {
+    public function __construct(Container $container, EntityManager $em, FileEncodingManager $encodingManager, Logger $oLogger, IdentityTranslator $translator, array $config, ProgressManager $progressManager) {
         $this->container = $container;
         $this->em = $em;
         $this->config = $config;
         $this->translator = $translator;
-        $this->logger = $logger;
+        $this->logger = $oLogger;
         $this->encodingManager = $encodingManager;
-        $this->encodingManager->setLogger($logger);
+        $this->encodingManager->setLogger($oLogger);
         $this->writerList = array();
         $this->progressManager = $progressManager;
     }

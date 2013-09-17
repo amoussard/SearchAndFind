@@ -5,7 +5,9 @@ namespace Drassuom\ImportBundle;
 use Doctrine\ORM\EntityManager;
 use Drassuom\ImportBundle\Manager\ProgressManager;
 use Drassuom\ImportBundle\Writer\ORM\BaseWriter;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
@@ -21,7 +23,7 @@ class Workflow
     protected $conditions = array();
 
     /**
-     * @var array
+     * @var BaseWriter[]
      */
     protected $writers;
 
@@ -111,7 +113,7 @@ class Workflow
     protected $childrenOptions = null;
 
     /**
-     * @var \Symfony\Component\HttpKernel\Log\LoggerInterface
+     * @var LoggerInterface
      */
     protected $logger = null;
 
@@ -165,27 +167,28 @@ class Workflow
 
 
     /**
-     * @param Entity\Import $import
-     * @param bool          $isChild
+     * @param Import $oImport
+     * @param bool   $bIsChild
      */
-    public function prepare(Import $import, $isChild = false) {
+    public function prepare(Import $oImport, $bIsChild = false) {
         $this->currentRow = 0;
-        $this->import = $import;
+        $this->import = $oImport;
 
         // Prepare writers
         foreach ($this->writers as $writer) {
-            $writer->prepare($isChild);
+            $writer->prepare($bIsChild);
+            $writer->setLogger($this->logger);
         }
     }
 
     /**
      * @param Import $oImport
-     * @param bool   $isChild
+     * @param bool   $bIsChild
      */
-    public function finish(Import $oImport, $isChild = false) {
+    public function finish(Import $oImport, $bIsChild = false) {
         // Finish writers
         foreach ($this->writers as $writer) {
-            $writer->finish($isChild);
+            $writer->finish($bIsChild);
         }
 
 
@@ -550,10 +553,11 @@ class Workflow
     private function convertItems($item, array &$converters) {
         foreach ($converters as $key => $options) {
             if (count($options) > 0){
-                $propertyPath = self::getFixedPropertyPath($key);
+                $oPropertyPath = self::getFixedPropertyPath($key);
                 $converted = $this->convertItem($item, $key, $options);
                 if (!empty($converted)) {
-                    $propertyPath->setValue($item, $converted);
+                    $oPropertyAccessor = PropertyAccess::createPropertyAccessor();
+                    $oPropertyAccessor->setValue($item, $oPropertyPath, $converted);
                 }
             }
         }
@@ -567,7 +571,10 @@ class Workflow
      */
     public static function getFixedPropertyPath($accessor) {
         $fixedAccessor = preg_replace('/^([^\[]+)([\[]?)/', '[$1]$2', $accessor, 1);
-        return new PropertyPath($fixedAccessor);
+
+        $oPropertyPath = new PropertyPath($fixedAccessor);
+
+        return $oPropertyPath;
     }
 
     /**

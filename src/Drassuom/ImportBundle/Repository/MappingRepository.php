@@ -1,6 +1,6 @@
 <?php
 
-namespace Drassuom\ImportBundle\Entity;
+namespace Drassuom\ImportBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 

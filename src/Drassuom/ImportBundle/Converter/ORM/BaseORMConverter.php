@@ -57,7 +57,7 @@ abstract class BaseORMConverter extends Converter
         if (!$this->registry->has('prefetch', 'mapping')) {
             $this->mapping = array();
             /** @var MappingRepository $repo  */
-            $repo = $this->em->getRepository('NovaImportBundle:Mapping');
+            $repo = $this->em->getRepository('DrassuomImportBundle:Mapping');
             $mappingList = $repo->findAll();
             foreach ($mappingList as $mapping) {
                 $key = $mapping->getType().'_'.$mapping->getOriginalValue();

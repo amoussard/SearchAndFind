@@ -1,6 +1,51 @@
 drassuom_import:
     types:
+        geoname_continent:
+            writer: drassuom_location.import.writer.continent
+            writer_options: {class: Drassuom\LocationBundle\Entity\Continent}
+            ref_fields: [geonameId]
+            known_extensions:
+                txt: csv
+            csv:
+                delimiter: "\t"
+                mapping:
+                    iso:        {path: 0}
+                    name:       {path: 1}
+                    geonameId:  {path: 2}
+
+
         geoname_country:
+            writer: drassuom_location.import.writer.country
+            writer_options: {class: Drassuom\LocationBundle\Entity\Country}
+            ref_fields: [geonameId]
+            known_extensions:
+                txt: csv
+            csv:
+                delimiter: "\t"
+                mapping:
+                    iso:                {path: 0}
+                    iso3:               {path: 1}
+                    isoNumeric:         {path: 2}
+                    fips:               {path: 3}
+                    name:               {path: 4}
+                    area:               {path: 6}
+                    population:         {path: 7}
+                    parent:             {path: 8}
+                    tld:                {path: 9}
+                    currencyCode:       {path: 10}
+                    currencyName:       {path: 11}
+                    indPhone:           {path: 12}
+                    postalCodeFormat:   {path: 13}
+                    postalCodeRegex:    {path: 14}
+                    languages:          {path: 15}
+                    geonameId:          {path: 16}
+            converters:
+                parent:
+                    drassuom_import.converter.orm.entity_finder:
+                         params: {field: iso, entity: "DrassuomLocationBundle:Continent"}
+
+
+        geoname_city:
             writer: drassuom_location.import.writer.country
             writer_options: {class: Drassuom\LocationBundle\Entity\Country}
             ref_fields: [geonameId]

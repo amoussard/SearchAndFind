@@ -3,6 +3,7 @@
 namespace Drassuom\ImportBundle\Writer\ORM;
 
 use Doctrine\ORM\EntityManager;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bridge\Monolog\Logger;
 use JMS\DiExtraBundle\Annotation as DI;
@@ -49,7 +50,7 @@ abstract class BaseWriter
     protected $output;
 
     /**
-     * @var \Symfony\Component\HttpKernel\Log\LoggerInterface
+     * @var LoggerInterface
      */
     protected $logger;
 
@@ -158,10 +159,10 @@ abstract class BaseWriter
     }
 
     /**
-     * @param \Symfony\Component\HttpKernel\Log\LoggerInterface $logger
+     * @param LoggerInterface $oLogger
      */
-    public function setLogger(\Symfony\Component\HttpKernel\Log\LoggerInterface $logger) {
-        $this->logger = $logger;
+    public function setLogger(LoggerInterface $oLogger) {
+        $this->logger = $oLogger;
     }
 
     /**

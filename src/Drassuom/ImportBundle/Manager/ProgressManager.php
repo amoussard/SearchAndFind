@@ -206,8 +206,9 @@ class ProgressManager
             if ($this->output && $iProgress) {
                 $iNbStepPassed = floor(($iProgress * 2) / 10);
                 $iNbStepMiss = 20 - $iNbStepPassed;
-                $sInfos = sprintf("<info>%02d %% </info><comment>%s</comment><comment>Memory usage : %s</comment>",
+                $sInfos = sprintf("<info>%02d %% </info> Temps passé : <comment>%s</comment> Temps restant : <comment>%s</comment> Utilisation mémoire : <comment>%s</comment>",
                     $iProgress,
+                    ($aProgressInfos['elapsed'] !== null) ? $aProgressInfos['elapsed'] : '',
                     ($aProgressInfos['timeLeft'] !== null) ? $aProgressInfos['timeLeft'] : '',
                     ($aProgressInfos['memoryUsage'] !== null) ? $aProgressInfos['memoryUsage'] : ''
                 );
