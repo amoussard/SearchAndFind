@@ -2,6 +2,7 @@
 
 namespace Drassuom\LocationBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo; // this will be like an alias for Gedmo extensions annotations
 use Doctrine\ORM\Mapping as ORM;
 
@@ -90,6 +91,7 @@ class Location
     public function __construct() {
         $this->setCreatedAt(new \DateTime("now"));
         $this->setUpdatedAt(new \DateTime("now"));
+        $this->children = new ArrayCollection();
     }
 
     /**

@@ -39,11 +39,15 @@ drassuom_import:
                     postalCodeRegex:    {path: 14}
                     languages:          {path: 15}
                     geonameId:          {path: 16}
+                    neighbours:         {path: 17}
             converters:
                 parent:
                     drassuom_import.converter.orm.entity_finder:
                          params: {field: iso, entity: "DrassuomLocationBundle:Continent"}
-
+                neighbours:
+                    drassuom_location.converter.list:
+                        params: {refField: iso, delimiter: ",", entity: "DrassuomLocationBundle:Country"}
+                        field:  neighbours
 
         geoname_city:
             writer: drassuom_location.import.writer.country

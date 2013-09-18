@@ -6,8 +6,9 @@ use Doctrine\ORM\EntityManager;
 
 use Drassuom\ImportBundle\Converter\Converter;
 use Drassuom\ImportBundle\Entity\Mapping;
-use Drassuom\ImportBundle\Entity\MappingRepository;
+use Drassuom\ImportBundle\Repository\MappingRepository;
 use Drassuom\ImportBundle\Manager\RegistryManager;
+use JMS\DiExtraBundle\Annotation as DI;
 
 /**
  * Description of BaseConverter.php
@@ -37,13 +38,12 @@ abstract class BaseORMConverter extends Converter
     /**
      * @param \Doctrine\ORM\EntityManager $em
      * @param $registry
-     * @InjectParams({
-     *     "em"         = @Inject("doctrine.orm.entity_manager"),
-     *     "registry"   = @Inject("drassuom_import.registry_manager")
+     * @DI\InjectParams({
+     *     "em"         = @DI\Inject("doctrine.orm.entity_manager"),
+     *     "registry"   = @DI\Inject("drassuom_import.registry_manager")
      * })
      */
-    public function __construct(EntityManager $em, RegistryManager $registry)
-    {
+    public function __construct(EntityManager $em, RegistryManager $registry) {
         $this->em = $em;
         $this->registry = $registry;
         $this->prefetchMapping();
@@ -70,11 +70,15 @@ abstract class BaseORMConverter extends Converter
     }
 
     /**
+     * @param string $sEntity
+     *
      * @return \Doctrine\ORM\EntityRepository
      */
-    public function getRepository()
-    {
-        return $this->em->getRepository($this->class);
+    public function getRepository($sEntity = "") {
+        if (empty($sEntity)) {
+            return $this->em->getRepository($this->class);
+        }
+        return $this->em->getRepository($sEntity);
     }
 
     /**

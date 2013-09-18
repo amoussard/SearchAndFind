@@ -2,6 +2,7 @@
 
 namespace Drassuom\LocationBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo; // this will be like an alias for Gedmo extensions annotations
 use Doctrine\ORM\Mapping as ORM;
 
@@ -102,6 +103,35 @@ class Country extends Location
      * @ORM\Column(name="langagues", type="string")
      */
     protected $languages;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Country", mappedBy="neighbours")
+     */
+    protected $neighboursWithMe;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Country", inversedBy="neighboursWithMe")
+     * @ORM\JoinTable(
+     *      name="neighbours",
+     *      joinColumns={@ORM\JoinColumn(
+     *          name="country_id",
+     *          referencedColumnName="id"
+     *      )},
+     *      inverseJoinColumns={@ORM\JoinColumn(
+     *          name="neighbour_country_id",
+     *          referencedColumnName="id"
+     *      )}
+     *  )
+     */
+    protected $neighbours;
+
+
+
+    public function __construct() {
+        parent::__construct();
+        $this->neighbours = new ArrayCollection();
+        $this->neighboursWithMe = new ArrayCollection();
+    }
 
     /**
      * @param int $area
@@ -284,6 +314,36 @@ class Country extends Location
     public function getTld() {
         return $this->tld;
     }
+
+    /**
+     * @param mixed $neighbours
+     */
+    public function setNeighbours($neighbours) {
+        $this->neighbours = $neighbours;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNeighbours() {
+        return $this->neighbours;
+    }
+
+    /**
+     * @param mixed $neighboursWithMe
+     */
+    public function setNeighboursWithMe($neighboursWithMe) {
+        $this->neighboursWithMe = $neighboursWithMe;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNeighboursWithMe() {
+        return $this->neighboursWithMe;
+    }
+
+
 
 
 }

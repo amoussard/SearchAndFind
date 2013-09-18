@@ -142,16 +142,19 @@ class Workflow
         $this->translator = $translator;
     }
 
-
-    public function process(Import $import)
-    {
-        $this->prepare($import);
+    /**
+     * @param Import $oImport
+     *
+     * @return int
+     */
+    public function process(Import $oImport) {
+        $this->prepare($oImport);
         // Read all items
         $this->countRow = $this->reader->count();
         $this->progressManager->setupProgress($this, $this->countRow);
         foreach ($this->reader as $item) {
             $this->currentRow++;
-            $this->processItem($import, $item);
+            $this->processItem($oImport, $item);
             $this->progressManager->showProgress($this->currentRow);
             if ($this->stop) {
                 if ($this->output) {
@@ -160,7 +163,7 @@ class Workflow
                 break;
             }
         }
-        $this->finish($import);
+        $this->finish($oImport);
         $this->progressManager->clearProgress();
         return $this->currentRow;
     }
@@ -190,8 +193,6 @@ class Workflow
         foreach ($this->writers as $writer) {
             $writer->finish($bIsChild);
         }
-
-
     }
 
     /**
@@ -513,23 +514,22 @@ class Workflow
                 $convertedItem = $value['value'];
             } else {
                 if (!empty($value['field'])) {
-                    $propertyPath = self::getFixedPropertyPath($value['field']);
-                    $convertedItem = $propertyPath->getValue($items);
+                    $oPropertyAccessor = PropertyAccess::createPropertyAccessor();
+                    $oPropertyPath = self::getFixedPropertyPath($value['field']);
+                    $convertedItem = $oPropertyAccessor->getValue($items, $oPropertyPath);
                 } elseif (isset($value['fields']) && count($value['fields']) > 0) {
                     $fields = $value['fields'];
                     $convertedItem = array();
+                    $oPropertyAccessor = PropertyAccess::createPropertyAccessor();
                     foreach ($fields as $key => $field) {
-                        $propertyPath = self::getFixedPropertyPath($field);
+                        $oPropertyPath = self::getFixedPropertyPath($field);
                         if (is_numeric($key)) {
-                            $convertedItem[$field] = $propertyPath->getValue($items);;
+                            $convertedItem[$field] = $oPropertyAccessor->getValue($items, $oPropertyPath);
                         } else {
-                            $convertedItem[$key] = $propertyPath->getValue($items);
+                            $convertedItem[$key] = $oPropertyAccessor->getValue($items, $oPropertyPath);
                         }
                     }
                 }
-            }
-            if (empty($convertedItem)) {
-                break;
             }
             if (is_array($convertedItem) && empty($value['fields'])) {
                 $ret = array();
@@ -553,9 +553,9 @@ class Workflow
     private function convertItems($item, array &$converters) {
         foreach ($converters as $key => $options) {
             if (count($options) > 0){
-                $oPropertyPath = self::getFixedPropertyPath($key);
                 $converted = $this->convertItem($item, $key, $options);
                 if (!empty($converted)) {
+                    $oPropertyPath = self::getFixedPropertyPath($key);
                     $oPropertyAccessor = PropertyAccess::createPropertyAccessor();
                     $oPropertyAccessor->setValue($item, $oPropertyPath, $converted);
                 }
@@ -601,7 +601,7 @@ class Workflow
     }
 
     /**
-     * @return Traversable
+     * @return \Traversable
      */
     public function getReader()
     {
