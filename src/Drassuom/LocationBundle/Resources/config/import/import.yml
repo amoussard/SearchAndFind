@@ -17,7 +17,7 @@ drassuom_import:
         geoname_country:
             writer: drassuom_location.import.writer.country
             writer_options: {class: Drassuom\LocationBundle\Entity\Country}
-            ref_fields: [geonameId]
+            ref_fields: [iso]
             known_extensions:
                 txt: csv
             csv:
@@ -48,6 +48,89 @@ drassuom_import:
                     drassuom_location.converter.list:
                         params: {refField: iso, delimiter: ",", entity: "DrassuomLocationBundle:Country"}
                         field:  neighbours
+
+        geoname_country2:
+            writer: drassuom_location.import.writer.country
+            writer_options: {class: Drassuom\LocationBundle\Entity\Country}
+            ref_fields: [geonameId]
+            known_extensions:
+                txt: csv
+            conditions:
+                is_country:
+                    key: featureCode
+                    call: "in_array"
+                    params: {0: PCLI}
+                    merge: false
+            filters:
+                exclude: [!is_country]
+            csv:
+                delimiter: "\t"
+                mapping:
+                    geonameId:          {path: 0}
+                    name:               {path: 1}
+                    latitude:           {path: 4}
+                    longitude:          {path: 5}
+                    featureCode:        {path: 7}
+
+        geoname_adm1:
+            writer: drassuom_location.import.writer.location
+            writer_options: {class: Drassuom\LocationBundle\Entity\AdmDivision1}
+            ref_fields: [geonameId]
+            known_extensions:
+                txt: csv
+            conditions:
+                is_adm1:
+                    key: featureCode
+                    call: "in_array"
+                    params: {0: ADM1}
+                    merge: false
+            filters:
+                exclude: [!is_adm1]
+            csv:
+                delimiter: "\t"
+                mapping:
+                    geonameId:          {path: 0}
+                    name:               {path: 1}
+                    latitude:           {path: 4}
+                    longitude:          {path: 5}
+                    featureCode:        {path: 7}
+                    parent:             {path: 8}
+                    code:               {path: 10}
+                    population:         {path: 14}
+            converters:
+                parent:
+                    drassuom_import.converter.orm.entity_finder:
+                         params: {field: iso, entity: "DrassuomLocationBundle:Country"}
+
+        geoname_adm2:
+            writer: drassuom_location.import.writer.location
+            writer_options: {class: Drassuom\LocationBundle\Entity\AdmDivision2}
+            ref_fields: [geonameId]
+            known_extensions:
+                txt: csv
+            conditions:
+                is_adm2:
+                    key: featureCode
+                    call: "in_array"
+                    params: {0: ADM2}
+                    merge: false
+            filters:
+                exclude: [!is_adm2]
+            csv:
+                delimiter: "\t"
+                mapping:
+                    geonameId:          {path: 0}
+                    name:               {path: 1}
+                    latitude:           {path: 4}
+                    longitude:          {path: 5}
+                    featureCode:        {path: 7}
+                    parent:             {path: 10}
+                    code:               {path: 11}
+                    population:         {path: 14}
+            converters:
+                parent:
+                    drassuom_import.converter.orm.entity_finder:
+                         params: {field: code, entity: "DrassuomLocationBundle:AdmDivision1"}
 
         geoname_city:
             writer: drassuom_location.import.writer.country

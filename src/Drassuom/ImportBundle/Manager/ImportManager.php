@@ -5,7 +5,7 @@ namespace Drassuom\ImportBundle\Manager;
 use Symfony\Component\DependencyInjection\Container;
 
 use Monolog\Logger;
-use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Doctrine\ORM\EntityManager;
 
 use Drassuom\ImportBundle\Workflow;
@@ -42,7 +42,7 @@ class ImportManager
     protected $logger;
 
     /**
-     * @var IdentityTranslator
+     * @var Translator
      */
     protected $translator;
 
@@ -86,11 +86,11 @@ class ImportManager
      * @param \Doctrine\ORM\EntityManager                      $em
      * @param FileEncodingManager                              $encodingManager
      * @param Logger                                           $oLogger
-     * @param IdentityTranslator                               $translator
+     * @param Translator                               $translator
      * @param array                                            $config
      * @param ProgressManager                                  $progressManager
      */
-    public function __construct(Container $container, EntityManager $em, FileEncodingManager $encodingManager, Logger $oLogger, IdentityTranslator $translator, array $config, ProgressManager $progressManager) {
+    public function __construct(Container $container, EntityManager $em, FileEncodingManager $encodingManager, Logger $oLogger, Translator $translator, array $config, ProgressManager $progressManager) {
         $this->container = $container;
         $this->em = $em;
         $this->config = $config;

@@ -8,7 +8,7 @@ use Drassuom\ImportBundle\Writer\ORM\BaseWriter;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Drassuom\ImportBundle\Exception\ConfigException;
@@ -68,7 +68,7 @@ class Workflow
     protected $container;
 
     /**
-     * @var IdentityTranslator
+     * @var Translator
      */
     protected $translator;
 
@@ -134,9 +134,9 @@ class Workflow
 
     /**
      * @param \Symfony\Component\DependencyInjection\Container $container
-     * @param IdentityTranslator        $translator
+     * @param Translator        $translator
      */
-    public function __construct(Container $container, IdentityTranslator $translator) {
+    public function __construct(Container $container, Translator $translator) {
         $this->container = $container;
         $this->writers = array();
         $this->translator = $translator;
@@ -382,14 +382,17 @@ class Workflow
             if (!isset($this->mappingOptions[$key])) {
                 throw new \RuntimeException("can not get mapping options for [$key]");
             }
-            $propertyPath = self::getFixedPropertyPath($key);
+
+            $oPropertyAccessor = PropertyAccess::createPropertyAccessor();
+            $oPropertyPath = self::getFixedPropertyPath($key);
+
             $mappingOptions = $this->mappingOptions[$key];
-            $propertyPath->setValue($item, $this->mapper->mapItem($item, $key, $mappingOptions, $mappingError));
+            $oPropertyAccessor->setValue($item, $oPropertyPath, $this->mapper->mapItem($item, $key, $mappingOptions, $mappingError));
             if (isset($this->converters[$key])) {
                 $convertOptions = $this->converters[$key];
                 $convertedItem = $this->convertItem($item, $key, $convertOptions);
             } else {
-                $convertedItem = $propertyPath->getValue($item);
+                $convertedItem = $oPropertyAccessor->getValue($item, $oPropertyPath);
             }
 
             if ($this->validator->validateItem($convertedItem, $options['call'], $options)) {

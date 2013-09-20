@@ -1,0 +1,10 @@
+import_error_format: "[Ligne={{ row }}] [Référence={{ ref }}] : {{ message }}"
+
+error:
+    empty:
+        ref_field_name: Cette ligne n'as pas de référence
+    mapping:
+        min_column: Cette ligne doit comporter au moins {{ min }} colonnes.
+
+    xpath:
+        mapping: La balise [{{ path }}] est manquante

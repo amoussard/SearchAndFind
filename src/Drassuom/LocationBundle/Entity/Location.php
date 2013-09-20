@@ -13,7 +13,13 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table("Location")
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="type", type="string")
- * @ORM\DiscriminatorMap({ "continent" = "Continent", "country" = "Country", "city" = "City",})
+ * @ORM\DiscriminatorMap({
+ *      "continent" = "Continent",
+ *      "country" = "Country",
+ *      "adm1" = "AdmDivision1",
+ *      "adm2" = "AdmDivision2",
+ *      "city" = "City"
+ *  })
  * @ORM\Entity(repositoryClass="Drassuom\LocationBundle\Entity\LocationRepository")
  */
 class Location
@@ -56,6 +62,14 @@ class Location
      * @ORM\Column(name="longitude", type="string", length=255, nullable=true)
      */
     protected $longitude;
+
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="population", type="integer", nullable=true)
+     */
+    protected $population;
 
 
     /**
@@ -217,6 +231,21 @@ class Location
     public function getLongitude()
     {
         return $this->longitude;
+    }
+
+
+    /**
+     * @param int $population
+     */
+    public function setPopulation($population) {
+        $this->population = $population;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPopulation() {
+        return $this->population;
     }
 
     /**

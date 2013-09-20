@@ -105,7 +105,7 @@ class CsvReader implements \SeekableIterator
     public function setFile(File $file)
     {
         $this->file = $file->openFile();
-        $this->file->setFlags(\SplFileObject::READ_CSV |  \SplFileObject::SKIP_EMPTY |  \SplFileObject::READ_AHEAD);
+        $this->file->setFlags(\SplFileObject::SKIP_EMPTY |  \SplFileObject::READ_AHEAD);
         $this->file->setCsvControl(
             $this->delimiter,
             $this->enclosure,
@@ -135,7 +135,7 @@ class CsvReader implements \SeekableIterator
 
         } else {
             // Else just return the column values
-            return $line;
+            return explode($this->delimiter, $line);
         }
         return null;
     }

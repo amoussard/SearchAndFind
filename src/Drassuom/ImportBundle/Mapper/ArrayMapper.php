@@ -1,6 +1,6 @@
 <?php
 
-namespace Nova\ImportBundle\Mapper;
+namespace Drassuom\ImportBundle\Mapper;
 
 use Drassuom\ImportBundle\Workflow;
 use JMS\DiExtraBundle\Annotation as DI;

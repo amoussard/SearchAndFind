@@ -49,13 +49,6 @@ class Country extends Location
     protected $area;
 
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="population", type="integer")
-     */
-    protected $population;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="tld", type="string", length=5)
@@ -257,20 +250,6 @@ class Country extends Location
      */
     public function getLanguages() {
         return $this->languages;
-    }
-
-    /**
-     * @param int $population
-     */
-    public function setPopulation($population) {
-        $this->population = $population;
-    }
-
-    /**
-     * @return int
-     */
-    public function getPopulation() {
-        return $this->population;
     }
 
     /**
