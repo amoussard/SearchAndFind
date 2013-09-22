@@ -20,6 +20,12 @@ class AdmDivision1 extends Location
     protected $code;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Country")
+     * @ORM\JoinColumn(name="country_id", referencedColumnName="id")
+     */
+    private $country;
+
+    /**
      * @param string $code
      */
     public function setCode($code) {
@@ -32,4 +38,20 @@ class AdmDivision1 extends Location
     public function getCode() {
         return $this->code;
     }
+
+    /**
+     * @param mixed $country
+     */
+    public function setCountry($country) {
+        $this->country = $country;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCountry() {
+        return $this->country;
+    }
+
+
 }

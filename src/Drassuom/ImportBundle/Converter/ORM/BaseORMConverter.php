@@ -95,17 +95,17 @@ abstract class BaseORMConverter extends Converter
         } else {
             $mapping = null;
         }
-        $key = $this->getKey($input, $mapping, $options);
-        if ($key && $this->registry->has($key)) {
-            $object = $this->registry->get($key);
-            //$this->refreshEntity($object);
-            return $object;
-        }
+//        $key = $this->getKey($input, $mapping, $options);
+//        if ($key && $this->registry->has($key)) {
+//            $object = $this->registry->get($key);
+//            //$this->refreshEntity($object);
+//            return $object;
+//        }
         $output = $this->doConvert($input, $mapping, $options);
-        if (is_object($output) && $key) {
-            // keep object in registry, to avoid duplicate (when transaction not flushed)
-            $this->registry->add($key, $output);
-        }
+//        if (is_object($output) && $key) {
+//            // keep object in registry, to avoid duplicate (when transaction not flushed)
+//            $this->registry->add($key, $output);
+//        }
         return $output;
     }
 

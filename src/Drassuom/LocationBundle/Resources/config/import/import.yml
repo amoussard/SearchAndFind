@@ -94,6 +94,7 @@ drassuom_import:
                     latitude:           {path: 4}
                     longitude:          {path: 5}
                     featureCode:        {path: 7}
+                    country:            {path: 8}
                     parent:             {path: 8}
                     code:               {path: 10}
                     population:         {path: 14}
@@ -101,6 +102,20 @@ drassuom_import:
                 parent:
                     drassuom_import.converter.orm.entity_finder:
                          params: {field: iso, entity: "DrassuomLocationBundle:Country"}
+                country:
+                    drassuom_import.converter.orm.entity_finder:
+                         params: {field: iso, entity: "DrassuomLocationBundle:Country"}
+            post_validators:
+                parent:
+                    is_a:
+                        params: [Drassuom\LocationBundle\Entity\Country]
+                        merge: true
+                        message: "Impossible de retrouver le pays [{{ value }}]."
+                country:
+                    is_a:
+                        params: [Drassuom\LocationBundle\Entity\Country]
+                        merge: true
+                        message: "Impossible de retrouver le pays [{{ value }}]."
 
         geoname_adm2:
             writer: drassuom_location.import.writer.location
@@ -124,24 +139,93 @@ drassuom_import:
                     latitude:           {path: 4}
                     longitude:          {path: 5}
                     featureCode:        {path: 7}
+                    country:            {path: 8}
                     parent:             {path: 10}
                     code:               {path: 11}
                     population:         {path: 14}
             converters:
+                country:
+                    drassuom_import.converter.orm.entity_finder:
+                        params: {field: iso, entity: "DrassuomLocationBundle:Country"}
                 parent:
                     drassuom_import.converter.orm.entity_finder:
-                         params: {field: code, entity: "DrassuomLocationBundle:AdmDivision1"}
+                        params: {entity: "DrassuomLocationBundle:AdmDivision1"}
+                        fields: {code: parent, country: country}
+            post_validators:
+                country:
+                    is_a:
+                        params: [Drassuom\LocationBundle\Entity\Country]
+                        merge: true
+                        message: "Impossible de retrouver le pays [{{ value }}]."
+                parent:
+                    is_a:
+                        params: [Drassuom\LocationBundle\Entity\AdmDivision1]
+                        merge: true
+                        message: "Impossible de retrouver la division parente [{{ value }}]."
+
 
         geoname_city:
-            writer: drassuom_location.import.writer.country
-            writer_options: {class: Drassuom\LocationBundle\Entity\Country}
+            writer: drassuom_location.import.writer.location
+            writer_options: {class: Drassuom\LocationBundle\Entity\City}
             ref_fields: [geonameId]
             known_extensions:
                 txt: csv
+            conditions:
+                capital:
+                    key: featureCode
+                    call: "in_array"
+                    params: [PPLC]
+                    merge: false
+                adm_city:
+                    key: featureCode
+                    call: "in_array"
+                    params: [PPLA,PPLA1,PPLA2,PPLA3,PPLA4]
+                    merge: false
+                city:
+                    key: featureCode
+                    call: "in_array"
+                    params: [PPL]
+                    merge: false
+            filters:
+                include: [capital, adm_city, city]
             csv:
                 delimiter: "\t"
                 mapping:
-                    geonameId:                  {path: 0}
-                    name:                       {path: 1}
-                    latitude:                   {path: 4}
-                    longitude:                  {path: 5}
+                    geonameId:          {path: 0}
+                    name:               {path: 1}
+                    latitude:           {path: 4}
+                    longitude:          {path: 5}
+                    featureCode:        {path: 7}
+                    country:            {path: 8}
+                    adm1:               {path: 10}
+                    adm2:               {path: 11}
+                    parent:             {path: 11}
+                    population:         {path: 14}
+            converters:
+                country:
+                    drassuom_import.converter.orm.entity_finder:
+                        params: {field: iso, entity: "DrassuomLocationBundle:Country"}
+                adm1:
+                    drassuom_import.converter.orm.entity_finder:
+                        params: {entity: "DrassuomLocationBundle:AdmDivision1"}
+                        fields: {code: adm1, country: country}
+                parent:
+                    drassuom_import.converter.orm.entity_finder:
+                         params: {entity: "DrassuomLocationBundle:AdmDivision2"}
+                         fields: {code: adm2, parent: adm1, country: country}
+            post_validators:
+                country:
+                    is_a:
+                        params: [Drassuom\LocationBundle\Entity\Country]
+                        merge: true
+                        message: "Impossible de retrouver le pays [{{ value }}]."
+                adm1:
+                    is_a:
+                        params: [Drassuom\LocationBundle\Entity\AdmDivision1]
+                        merge: true
+                        message: "Impossible de retrouver la division adm1 parente [{{ value }}]."
+                parent:
+                    is_a:
+                        params: [Drassuom\LocationBundle\Entity\AdmDivision2]
+                        merge: true
+                        message: "Impossible de retrouver la division parente [{{ value }}]."
